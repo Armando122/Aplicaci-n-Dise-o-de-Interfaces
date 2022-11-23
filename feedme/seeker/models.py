@@ -18,7 +18,8 @@ class Edificio_Piso(models.Model):
     def __str__(self):
         return str(self.nombre)+","+self.nombre_edificio+","+str(self.piso)
     def get_instrucciones_salida(self):
-        return self.instrucciones_salida.split("\n")
+        print(self.instrucciones_salida.strip().split("\n"))
+        return self.instrucciones_salida.strip().split("\n")
 class Alimento(models.Model):
     nombre = models.CharField(max_length=200, null=True)
     calorias = models.FloatField(null=True)

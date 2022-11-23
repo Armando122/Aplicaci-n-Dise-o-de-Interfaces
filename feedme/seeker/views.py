@@ -24,12 +24,38 @@ class HomeView(TemplateView):
     template_name = 'index.html'
 
 
-def get_coordinates():
-    pass
+def get_info_from_file(files:list):
+    for f in files:
+        with open(f) as file_manager:
+            nuevoLugar=None
+            while True:
+                line = file_manager.readline().strip()
+                if not line:
+                    break
+                #print(line.split(":"))
+
+                if line.split(":")[0].strip()=="Lugar":
+                    print("in -lugar")
+                    div=line.split(",")
+                    nuevoLugar=Lugar(nombre=line.split(",")[0].split(":")[1], direccion=div[1]+div[2])
+                    nuevoLugar.save()
+                    print(line.split(",")[0].split(":")[1])
+                if line.split(":")[0].strip()=="Edificio":
+                    print("in-edificio")
+                    #print(line)#" ".join(line.split(",")[2:len(line.split(","))-1]))
+                    x=line.split(",")
+                    x.pop(0)
+                    x.pop(0)
+                    #print(x)
+                    joined=" ".join(x)
+                    out=joined.replace("\\n","\n")
+                    edif=Edificio_Piso(nombre= nuevoLugar, nombre_edificio=line.split(",")[0].split(":")[1], piso=line.split(",")[1], instrucciones_salida= out)
+                    edif.save()
 
 def index(request):
     Lugar.objects.all().delete();
-    r= Lugar(nombre="Facultad de Ciencias", direccion="Investigación Científica, C.U., Coyoacán, 04510 Ciudad de México, CDMX");
+    get_info_from_file(["info_psicologia/Formato_Lugar.txt"])
+    r= Lugar(nombre="Facultad de Ciencias", direccion="Investigación Científica, C.U., Coyoacán, 04510 Ciudad de México, CDMX")
     r.save()
     tlahuizcalpan0=Edificio_Piso(nombre=r,nombre_edificio="Tlahuizcalpan", piso="Planta Baja", instrucciones_salida="Toma la salida más cercana \n Si te encuentras cerca al árbol central, repliegate a las paredes \n Mantente alejado de vidrios, ventanas u objetos que puedan caer o volcarse \n Manten la calma")
     tlahuizcalpan1=Edificio_Piso(nombre=r,nombre_edificio="Tlahuizcalpan", piso="1", instrucciones_salida="Toma la salida más cercana de tu lado izquierdo \n Dirigete al busto de Darwin (entrada principal) \n En la salida izquierda encontrarás el punto de reunión más cercano \n Espera instrucciones del personal de protección civil o personal capacitado \n Manten la calma")
@@ -60,7 +86,7 @@ def index(request):
     resultados=Lugar.objects.all();
     lugares= Edificio_Piso.objects.all()
     context={'resultados':resultados, "lugares":lugares}
-    print(resultados)
+    #print(lugares)
     return render(request, 'seeker/index.html', context)
 
 
